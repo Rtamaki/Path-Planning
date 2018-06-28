@@ -1,6 +1,6 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
-   
+
 ### Simulator.
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases/tag/T3_v1.2).
 
@@ -38,13 +38,13 @@ Here is the data provided from the Simulator to the C++ Program
 #### Previous path data given to the Planner
 
 //Note: Return the previous list but with processed points removed, can be a nice tool to show how far along
-the path has processed since last time. 
+the path has processed since last time.
 
 ["previous_path_x"] The previous list of x points previously given to the simulator
 
 ["previous_path_y"] The previous list of y points previously given to the simulator
 
-#### Previous path's end s and d values 
+#### Previous path's end s and d values
 
 ["end_path_s"] The previous list's last point's frenet s value
 
@@ -52,7 +52,7 @@ the path has processed since last time.
 
 #### Sensor Fusion Data, a list of all other car's attributes on the same side of the road. (No Noise)
 
-["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates. 
+["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates.
 
 ## Details
 
@@ -82,7 +82,7 @@ A really helpful resource for doing this project and creating smooth trajectorie
   * Run either `install-mac.sh` or `install-ubuntu.sh`.
   * If you install from source, checkout to commit `e94b6e1`, i.e.
     ```
-    git clone https://github.com/uWebSockets/uWebSockets 
+    git clone https://github.com/uWebSockets/uWebSockets
     cd uWebSockets
     git checkout e94b6e1
     ```
@@ -135,6 +135,26 @@ that's just a guess.
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+## Project Observations
+In this project, I applied the concepts of the classes in Udacity to control the behaviour of the car, so that it would attend to the traffic laws (speed limit),
+comfort demands (low jerk, low accelearation), would take the optimal path to reach destination as fast as possible, and wouldn't collide with other vehicles.
+Here is how each of these issues were addressed:
 
+#### Comfort
+Here, the main issue is the jerk, which is the derivative of the accelearation, which is present when we start the car, stop if there is a vehicle in front of us, or
+change lanes. To attend to the demands in the first 2 situations we can simply control the jerk by making the velocity increment in each time step by a determined amount. However, this is not enough for when we change lanes, because if we try to change lanes when going too fast, we will surpass the jerk limit. Therefore, the trajectory horizon needs to be far enough to avoid us making sudden change lane movemets.
+
+#### Traffic Laws
+It's the most simple of all, we just limit the maximum speed. Here I played safe and even gave safety interval.
+
+#### Optimal Path
+This is one of the main objective of the project. To achieve this goal, I made the car always strive to have the highest speed possible in its lane and to change lanes if possible.
+
+
+#### Safety/Collision
+We don't want to crash in the car in front of us if we are going faster than it, nor do we want to collide with the cars that are at our side when we try to change lanes. I satisfied the first requirement by lowering the my car speed to the car ahead if the last is within a 'safety distance', which is proportional to my car speed. To avoid crashing the cars by my side, I verified not only if it would be interesting to change lanes, but also if there aren't AND there won't be any cars within a safety margin were we try to change lanes.
+
+## Reflections
+In this project, I limited the complexity of the algorithm because of the time limit, however there are several improvements that can be done.
+1) Use A* or other path planning algorithm to find the best path even if it less obvious, such as changing 2 lanes to the right, or slowing down to change lanes, or accelerating to pass in a small gap.
+2) Use a cost function to estimate the cost of each behaviour/action, having the guarantee that it is optimal (at least for the defined expression). 
